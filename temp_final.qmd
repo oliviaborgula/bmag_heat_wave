@@ -49,3 +49,19 @@ june_90_days #view df
  
 write.csv(june_90_days, "june_90_days.csv", row.names = FALSE) #write to CSV to upload to Flourish
 ```
+
+```{r}
+library(readxl)
+
+#read the Excel file (change the path and sheet name)
+uhi <- read_excel("tract_heat.xlsx", sheet = "UHI effect by census tract")
+
+#upload UHI data
+uhi <- uhi%>%
+  clean_names()
+
+#filter UHI data to baltimore for visualization
+uhi_bmore <- uhi%>%
+  filter(city == "Baltimore)%>%
+  select(census_tract_number, urban_heat_island_effect_temperature_in_degrees_f)
+```
