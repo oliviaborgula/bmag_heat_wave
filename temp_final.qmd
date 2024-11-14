@@ -1,0 +1,51 @@
+---
+title: "temp_final"
+format: html
+editor: visual
+---
+
+```{r}
+#load libraries
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+#upload data
+#maximum temperatures last 50 years from NOAA
+long_temp <- read_csv("big_temp.csv")
+
+#clean names and select relevant columns
+long_temp <- long_temp%>%
+  clean_names()%>%
+  select(name, date, tmax)
+
+#upload data
+#average temperatures last 50 years from NOAA
+monthly_temp_avg <- read_csv("monthly_avg_temp.csv")
+
+#clean df
+monthly_temp_avg <- monthly_temp_avg %>% 
+  mutate_all(as.numeric)%>% #convert values from characters to numeric 
+  clean_names()%>% #clean column names
+  select(year, jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec)%>% #select relevant columns 
+  filter(!if_all(everything(), is.na)) #filter NA values 
+```
+
+```{r}
+#how many times have there been max tempreatures higher than 90? 
+#filter data to June 
+june_data <- long_temp %>%
+  filter(month(date) == 6)
+
+#count the number of 90+ degree days in each june
+june_90_days <- june_data %>%
+  mutate(year = year(date)) %>% #add column for year 
+  group_by(year) %>% #group by year
+  summarise(count_90_days = sum(tmax >= 90)) %>% #count 90+ degree days 
+  ungroup() 
+
+june_90_days #view df
+ 
+write.csv(june_90_days, "june_90_days.csv", row.names = FALSE) #write to CSV to upload to Flourish
+```
